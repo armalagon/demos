@@ -216,7 +216,7 @@ insert into attendance_detail(
 select  a.id
         , e.id
         , attd_date + time '07:15'
-from    attendance a cross join employee e
+from    attendance a cross join employee e;
 
 /*
 select to_char(current_date, 'day');
