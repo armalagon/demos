@@ -218,7 +218,7 @@ select  a.id
         , attd_date + time '07:15'
 from    attendance a cross join employee e
 
-
+/*
 select to_char(current_date, 'day');
 select * from attendance;
 
@@ -228,4 +228,4 @@ delete from attendance where id = 20200405;
 
 select * from attendance_detail where attendance_id = 20190920;
 truncate table attendance;
-
+*/

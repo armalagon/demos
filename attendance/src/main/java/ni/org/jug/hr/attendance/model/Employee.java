@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.StringJoiner;
 
 @Entity
 @Table(name = "employee")
@@ -160,15 +161,12 @@ public class Employee extends SerialIdentifiable<Integer> implements Activeable 
     }
 
     public String getFullname() {
-        StringBuilder fullname = new StringBuilder();
+        StringJoiner fullname = new StringJoiner(" ");
         if (names != null && names.getNames() != null) {
-            fullname.append(names.getNames());
+            fullname.add(names.getNames());
         }
         if (lastNames != null && lastNames.getNames() != null) {
-            if (fullname.length() > 0) {
-                fullname.append(" ");
-            }
-            fullname.append(lastNames.getNames());
+            fullname.add(lastNames.getNames());
         }
         return fullname.toString();
     }
