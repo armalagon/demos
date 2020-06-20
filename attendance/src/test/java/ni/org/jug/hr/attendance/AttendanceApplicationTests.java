@@ -1,7 +1,9 @@
 package ni.org.jug.hr.attendance;
 
+import com.sun.tools.doclets.internal.toolkit.taglets.PropertyGetterTaglet;
 import ni.org.jug.hr.attendance.model.Attendance;
 import ni.org.jug.hr.attendance.model.CountDTO;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,11 +12,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @SpringBootTest
 class AttendanceApplicationTests {
+
+    private static final ConcurrentMap<String, Long> STATS = new ConcurrentHashMap<>();
 
     @PersistenceContext
     EntityManager em;
@@ -29,7 +36,9 @@ class AttendanceApplicationTests {
         for (Attendance att : data) {
             System.out.println("Date: " + att.getDate() + ", dayname: " + att.getDayname());
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
     }
 
     @Test
@@ -44,7 +53,9 @@ class AttendanceApplicationTests {
             int count = att.getDetails().size();
             System.out.println("Date: " + att.getDate() + ", dayname: " + att.getDayname() + ", employee count: " + count);
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
     }
 
     @Test
@@ -59,7 +70,9 @@ class AttendanceApplicationTests {
             int count = att.getDetails().size();
             System.out.println("Date: " + att.getDate() + ", dayname: " + att.getDayname() + ", employee count: " + count);
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
     }
 
     @Test
@@ -75,7 +88,9 @@ class AttendanceApplicationTests {
         for (CountDTO att : data) {
             System.out.println("Date: " + att.date + ", dayname: " + att.dayName + ", employee count: " + att.count);
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
     }
 
     @Test
@@ -91,7 +106,9 @@ class AttendanceApplicationTests {
         for (Tuple tpl : data) {
             System.out.println("Date: " + tpl.get(0) + ", dayname: " + tpl.get(1) + ", employee count: " + tpl.get(2));
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
     }
 
     @Test
@@ -107,7 +124,9 @@ class AttendanceApplicationTests {
         for (Tuple tpl : data) {
             System.out.println("Date: " + tpl.get("date") + ", dayname: " + tpl.get("dayname") + ", employee count: " + tpl.get("count"));
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
     }
 
     @Test
@@ -123,7 +142,9 @@ class AttendanceApplicationTests {
         for (Map map : data) {
             System.out.println("Date: " + map.get("date") + ", dayname: " + map.get("dayname") + ", employee count: " + map.get("count"));
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
     }
 
     @Test
@@ -139,6 +160,26 @@ class AttendanceApplicationTests {
         for (List list : data) {
             System.out.println("Date: " + list.get(0) + ", dayname: " + list.get(1) + ", employee count: " + list.get(2));
         }
-        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
+    }
+
+    String getTestMethodName() {
+        StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+        return stackTrace[1].getMethodName();
+    }
+
+    @AfterAll
+    static void printStats() {
+        System.out.println("--------------------------------------------------------");
+        System.out.println("Fetching strategy duration");
+        System.out.println("--------------------------------------------------------");
+        STATS.entrySet().stream()
+                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .forEachOrdered((entry) -> {
+                    System.out.println("Method: " + entry.getKey() + ", Duration: " + entry.getValue());
+                });
+        System.out.println("--------------------------------------------------------");
     }
 }
