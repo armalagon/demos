@@ -77,4 +77,68 @@ class AttendanceApplicationTests {
         }
         System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
     }
+
+    @Test
+    void fetchProjectionUsingTuple_v1() {
+        TypedQuery<Tuple> query = em.createQuery("SELECT a.date, a.dayname, COUNT(d) " +
+                "FROM Attendance a JOIN a.details d " +
+                "WHERE a.year >= 2019 " +
+                "GROUP BY a.date, a.dayname", Tuple.class);
+
+        long start = System.currentTimeMillis();
+        List<Tuple> data = query.getResultList();
+        System.out.println("Days: " + data.size());
+        for (Tuple tpl : data) {
+            System.out.println("Date: " + tpl.get(0) + ", dayname: " + tpl.get(1) + ", employee count: " + tpl.get(2));
+        }
+        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+    }
+
+    @Test
+    void fetchProjectionUsingTuple_v2() {
+        TypedQuery<Tuple> query = em.createQuery("SELECT a.date as date, a.dayname as dayname, COUNT(d) as count " +
+                "FROM Attendance a JOIN a.details d " +
+                "WHERE a.year >= 2019 " +
+                "GROUP BY a.date, a.dayname", Tuple.class);
+
+        long start = System.currentTimeMillis();
+        List<Tuple> data = query.getResultList();
+        System.out.println("Days: " + data.size());
+        for (Tuple tpl : data) {
+            System.out.println("Date: " + tpl.get("date") + ", dayname: " + tpl.get("dayname") + ", employee count: " + tpl.get("count"));
+        }
+        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+    }
+
+    @Test
+    void fetchProjectionUsingMap() {
+        TypedQuery<Map> query = em.createQuery("SELECT new map(a.date as date, a.dayname as dayname, COUNT(d) as count) " +
+                "FROM Attendance a JOIN a.details d " +
+                "WHERE a.year >= 2019 " +
+                "GROUP BY a.date, a.dayname", Map.class);
+
+        long start = System.currentTimeMillis();
+        List<Map> data = query.getResultList();
+        System.out.println("Days: " + data.size());
+        for (Map map : data) {
+            System.out.println("Date: " + map.get("date") + ", dayname: " + map.get("dayname") + ", employee count: " + map.get("count"));
+        }
+        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+    }
+
+    @Test
+    void fetchProjectionUsingList() {
+        TypedQuery<List> query = em.createQuery("SELECT new list(a.date, a.dayname, COUNT(d)) " +
+                "FROM Attendance a JOIN a.details d " +
+                "WHERE a.year >= 2019 " +
+                "GROUP BY a.date, a.dayname", List.class);
+
+        long start = System.currentTimeMillis();
+        List<List> data = query.getResultList();
+        System.out.println("Days: " + data.size());
+        for (List list : data) {
+            System.out.println("Date: " + list.get(0) + ", dayname: " + list.get(1) + ", employee count: " + list.get(2));
+        }
+        System.out.println("Time elapsed: " + (System.currentTimeMillis() - start));
+    }
 }
