@@ -1,10 +1,11 @@
 package ni.org.jug.hr.attendance;
 
-import com.sun.tools.doclets.internal.toolkit.taglets.PropertyGetterTaglet;
+import ni.org.jug.hr.attendance.boundary.AttendanceRepository;
 import ni.org.jug.hr.attendance.model.Attendance;
 import ni.org.jug.hr.attendance.model.CountDTO;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,9 @@ class AttendanceApplicationTests {
 
     @PersistenceContext
     EntityManager em;
+
+    @Autowired
+    AttendanceRepository repository;
 
     @Test
     void fetchOnlyHeader() {
@@ -159,6 +163,33 @@ class AttendanceApplicationTests {
         System.out.println("Days: " + data.size());
         for (List list : data) {
             System.out.println("Date: " + list.get(0) + ", dayname: " + list.get(1) + ", employee count: " + list.get(2));
+        }
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
+    }
+
+    @Test
+    void fetchHeaderUsingRepository() {
+        long start = System.currentTimeMillis();
+        List<Attendance> data = repository.findAllAttendance();
+        System.out.println("Days: " + data.size());
+        for (Attendance att : data) {
+            int count = att.getDetails().size();
+            System.out.println("Date: " + att.getDate() + ", dayname: " + att.getDayname() + ", employee count: " + count);
+        }
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Time elapsed: " + duration);
+        STATS.put(getTestMethodName(), duration);
+    }
+
+    @Test
+    void fetchProjectionUsingRepository() {
+        long start = System.currentTimeMillis();
+        List<CountDTO> data = repository.findAttendanceCount();
+        System.out.println("Days: " + data.size());
+        for (CountDTO att : data) {
+            System.out.println("Date: " + att.date + ", dayname: " + att.dayName + ", employee count: " + att.count);
         }
         long duration = System.currentTimeMillis() - start;
         System.out.println("Time elapsed: " + duration);
