@@ -13,7 +13,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <pg.jdbc.version>42.2.11</pg.jdbc.version>
+        <pg.jdbc.version>42.2.25</pg.jdbc.version>
     </properties>
 
     <dependencies>
